@@ -1,0 +1,176 @@
+	<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title data-key="header">Ray's Gamepad Tester</title>
+		<link rel="icon" href="images\logo2.png">
+        <!-- CSS FILES -->                
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+
+        <link href="css/custom.css" rel="stylesheet">
+		
+
+    </head>
+    
+    <body>
+
+        <main>
+
+            <nav class="navbar navbar-expand-lg ">                
+                <div class="container">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/logo.png" class="navbar-brand-image img-fluid" alt="Ray Tester">
+                        <span class="navbar-brand-text">
+                            RAY
+                            <small>Gamepad</small>
+							<small>Analyzer</small>
+                        </span>
+                    </a>
+
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.html" data-key="home">Home</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link" href="oscilloscope.html" data-key="oscilloscope">Oscilloscope</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" href="linearity.html" data-key="linearity">Linearity</a>
+                            </li>
+							
+							<li class="nav-item">
+                                <a  class="nav-link" href="#" onclick="switchLanguage('en')">English</a> | <a  class="nav-link" href="#" onclick="switchLanguage('zh')">中文</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            
+
+            <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
+                <div class="container">
+                    <div class="row">
+						<div class="col-8 text-center">
+								<canvas id="joystickBtns" height="190" width="400"></canvas>
+								<canvas id="gamepadImg" height="250" width="300"></canvas>
+						</div>
+						<div class="col-4">
+							<div id="vibe1" class="section-bg-image-block">		
+								① <label id="joystickConnection0"></label><label id="joystickConnectionTime0"></label>
+							</div>
+							<div id="vibe2" class="section-bg-image-block">
+								② <label id="joystickConnection1"></label><label id="joystickConnectionTime1"></label>
+							</div>
+							<div id="vibe3" class="section-bg-image-block">
+								③ <label id="joystickConnection2"></label><label id="joystickConnectionTime2"></label>
+							</div>
+							<div id="vibe4" class="section-bg-image-block">
+								④ <label id="joystickConnection3"></label><label id="joystickConnectionTime3"></label>
+							</div>
+							<h5 class="white-font">FPS: <label id="fps"></label></h5>
+						</div>
+					</div>
+                </div>
+            </section>
+
+			<section class="section-padding">
+                <div class="mycontainer">
+            		<div class="row">
+						<div class="col-1 solution" >
+						<center>Adjustment plans:</center> 
+						</div>
+						<div class="col-11 row">
+							<div class="col-2">
+								<input name="solution" type="radio" id="RBnone" checked> <label for="RBnone" data-key="none">None</label>
+							</div>
+							<div class="col-10" id="noneOption">
+								● <span data-key="original">The original output.</span>
+							</div>
+							<div class="col-2">
+								<input name="solution" type="radio" id="RBgeneral"> <label for="RBgeneral" data-key="general">General:</label>
+							</div>
+							<div class="col-10" id="generalOption">
+								● <span data-key="amp">Output Amplify</span> <input type="text" id="outputAmplify" value="0" size="2" style="text-align: center;">%
+								● <span data-key="deadzone">Deadzone</span> <input type="text" id="deadzone" value="0" size="2" style="text-align: center;">%
+								● <span data-key="roundLock">Round Lock</span> <input type="checkbox" id="roundLock">
+							</div>
+							<div class="col-2">
+								<input name="solution" type="radio" id="RBindividual"> <label for="RBindividual" data-key="individual">Individual:</label>
+							</div>
+							<div class="col-10" id="individualOption">
+								● <input type="button" id="individualCenter" value="Center" class="btn custom-btn2"> L: <label id="centerLXY">(0.0 , 0.0)</label> R: <label id="centerRXY">(0.0 , 0.0)</label> 
+								● <span data-key="deadzone">Deadzone</span> <input type="text" id="deadzone2" value="0" size="2" style="text-align: center;">%
+								● <span data-key="roundLock">Round Lock</span> <input type="checkbox" id="roundLock2">
+								<br>
+								● <span data-key="edge">Edge Compensation (Draw 3 circles)</span>
+								<input type="button" id="edgeBtnL" value="Left" class="btn custom-btn2"> <label id="edgeValueL">No Data</label>
+								<input type="button" id="edgeBtnR" value="Right" class="btn custom-btn2"> <label id="edgeValueR">No Data</label> 
+								
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			</section>
+			
+			<section  id="section_3">
+				<div class="mytitle">
+					
+					<span data-key="linearityStd">Independent Linearity Standard:</span> <input type="text" id="linearityStd" value="4" size="2" style="text-align: center;">% <input type="button" class="custom-btn2" id="linearityTestBtn" value="START"> <span data-key="require">(Requires special tool.)</span>
+					<input name="testJoystick" type="radio" id="LJ"> <label for="LJ" data-key="lj">Left Joystick</label>
+					<input name="testJoystick" type="radio" id="RJ" checked> <label for="RJ" data-key="rj">Right Joystick</label>
+					
+				</div>
+				<div class="mycontainer">
+					<div class="row">
+						<div class="col-6" style="text-align: center;" id="xGo">
+							<span data-key="xpush">X Axis Push</span> <label id="resultX1"></label><br>
+							<canvas id="linearityCanvasX1" style="border:1px solid; background-color:#FFFFFF" width="500" height="500"></canvas>
+						</div>
+						<div class="col-6" style="text-align: center;" id="yGo">
+							<span data-key="ypush">Y Axis Push</span> <label id="resultY1"></label><br> 
+							<canvas id="linearityCanvasY1" style="border:1px solid; background-color:#FFFFFF" width="500" height="500"></canvas>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-6" style="text-align: center;" id="xBack">
+							<span data-key="xreturn">X Axis Return</span> <label id="resultX2"></label><br>
+							<canvas id="linearityCanvasX2" style="border:1px solid; background-color:#FFFFFF" width="500" height="500"></canvas>
+						</div>	
+						<div class="col-6" style="text-align: center;" id="yBack">
+							<span data-key="yreturn">Y Axis Return</span> <label id="resultY2"></label><br>
+							<canvas id="linearityCanvasY2" style="border:1px solid; background-color:#FFFFFF" width="500" height="500"></canvas>
+						</div>	
+					</div>   
+				</div>
+			</section>
+			<hr>
+			<center>
+				<span data-key="copyright">© 2024 Ray Liu. All rights reserved.</span>
+			</center>
+		</main>
+        <!-- JAVASCRIPT FILES -->
+		<script src="src/linearity.js" language="javascript"></script>
+		<script src="src/translate.js" language="javascript"></script>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script src="js/jquery.sticky.js"></script>
+		
+        <script src="js/animated-headline.js"></script>
+        <script src="js/modernizr.js"></script>
+        <script src="js/custom.js"></script>
+
+    </body>
+</html>

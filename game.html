@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+        <title>Gamepad Analyzer - In-depth Analysis Online</title>
+		<link rel="icon" href="images\logo2.png">
+        <!-- CSS FILES -->                
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+
+        <link href="css/custom.css" rel="stylesheet">
+		
+
+    </head>
+    
+    <body>
+
+        <main>
+
+            <nav class="navbar navbar-expand-lg ">                
+                <div class="container">
+                    <a class="navbar-brand d-flex align-items-center" href="index.html">
+                        <img src="images/logo.png" class="navbar-brand-image img-fluid" alt="Ray Tester">
+                        <span class="navbar-brand-text">
+                            RAY
+                            <small>Gamepad</small>
+							<small>Analyzer</small>
+                        </span>
+                    </a>
+
+    
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+    
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav ms-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="index.html">Home</a>
+                            </li>
+    
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="oscilloscope.html">Oscilloscope</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link click-scroll" href="linearity.html">Linearity</a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+                </div>
+            </nav>
+
+            
+
+            <section class="hero-section d-flex justify-content-center align-items-center" id="section_1">
+                <div class="container">
+                    <div class="row">
+						<div class="col-8 text-center">
+								<canvas id="joystickBtns" height="190" width="400"></canvas>
+								<canvas id="gamepadImg" height="250" width="300"></canvas>
+						</div>
+						<div class="col-4">
+							<div id="vibe1" class="section-bg-image-block">		
+								① <label id="joystickConnection0"></label><label id="joystickConnectionTime0"></label>
+							</div>
+							<div id="vibe2" class="section-bg-image-block">
+								② <label id="joystickConnection1"></label><label id="joystickConnectionTime1"></label>
+							</div>
+							<div id="vibe3" class="section-bg-image-block">
+								③ <label id="joystickConnection2"></label><label id="joystickConnectionTime2"></label>
+							</div>
+							<div id="vibe4" class="section-bg-image-block">
+								④ <label id="joystickConnection3"></label><label id="joystickConnectionTime3"></label>
+							</div>
+							<h5 class="white-font">FPS: <label id="fps"></label></h5>
+						</div>
+					</div>
+                </div>
+            </section>
+
+
+            <section class="section-padding">
+                <div class="mycontainer">
+                    <div class="row">
+						<div class="col-6">
+							<div class="mydiv">
+								<canvas id="left-joystick" style="border:1px solid;" width="300" height="300"></canvas>
+								<p><label id="left-x-axes"></label> <label id="left-y-axes"></label></p>
+								
+							</div>							
+							<!--<input type="checkbox" id="resolutionCB1"> <label id="st16">採樣精度測試</label>
+							<br><label id="resolutionResult1"></label>
+							<br><input type="button" id="responseRateBtn" value="Check Response Rate">
+							<br><label id="st24">(快速轉圈一秒鐘)</label>
+							<BR><label id="rrresult1"></label>
+							-->
+							<div>
+								Static Noise Test <input type="checkbox" id="staticNoiseCB1">
+								<!--<input type="button" id="staticNoiseBtn1" value="Start" class="btn custom-btn">-->
+								<p>x : <label id="staticResult0">0.0%</label>y : <label id="staticResult1">0.0%</label></p>
+							</div>
+							<hr>
+							<div>
+								Wobble Check
+								<p>
+								<input type="button" id="leftReturnBtn0" value="←" class="btn custom-btn">
+								<input type="button" id="rightReturnBtn0" value="→" class="btn custom-btn">
+								<label id="returnResult0">0.0%</label>
+								</p>
+								<p>
+								<input type="button" id="leftReturnBtn1" value="↑" class="btn custom-btn">
+								<input type="button" id="rightReturnBtn1" value="↓" class="btn custom-btn">
+								<label id="returnResult1">0.0%</label>
+								</p>
+							</div>
+							<hr>
+							Roundness Test <input type="checkbox" id="roundnessTestCB1">
+
+						</div>
+						<div class="col-6">
+							<div class="mydiv">
+								<canvas id="right-joystick" style="border:1px solid;" width="300" height="300"></canvas>
+								<p><label id="right-x-axes"></label> <label id="right-y-axes"></label></p>
+								
+							</div>
+
+							<div>
+								Static Noise Test <input type="checkbox" id="staticNoiseCB2">
+								<p>x: <label id="staticResult2">0.0%</label>   y: <label id="staticResult3">0.0%</label></p>
+							</div>
+							<hr>
+							<div>
+								Wobble Check
+								<p>
+								<input type="button" id="leftReturnBtn2" value="←" class="btn custom-btn">
+								<input type="button" id="rightReturnBtn2" value="→" class="btn custom-btn">
+								<label id="returnResult2">0.0%</label>
+								</p>
+								<p>
+								<input type="button" id="leftReturnBtn3" value="↑" class="btn custom-btn">
+								<input type="button" id="rightReturnBtn3" value="↓" class="btn custom-btn">
+								<label id="returnResult3">0.0%</label>
+								</p>
+							</div>
+							<hr>
+							Roundness Test <input type="checkbox" id="roundnessTestCB2">
+							
+						</div>
+						
+					</div>
+					
+					<div class="row">
+						<div class="col-1 solution" >
+						<center>Adjustment plans:</center> 
+						</div>
+						<div class="col-11 row">
+							<div class="col-2">
+								<input name="solution" type="radio" id="RBnone" checked> <label for="RBnone">None</label>
+							</div>
+							<div class="col-10" id="noneOption">
+								● The original output.
+							</div>
+							<div class="col-2">
+								<input name="solution" type="radio" id="RBgeneral"> <label for="RBgeneral">General:</label>
+							</div>
+							<div class="col-10" id="generalOption">
+								● Output Amplify <input type="text" id="outputAmplify" value="0" size="2" style="text-align: center;">%
+								● Deadzone <input type="text" id="deadzone" value="0" size="2" style="text-align: center;">%
+								● Round Lock <input type="checkbox" id="roundLock">
+							</div>
+							<div class="col-2">
+								<input name="solution" type="radio" id="RBindividual"> <label for="RBindividual">Individual:</label>
+							</div>
+							<div class="col-10" id="individualOption">
+								● <input type="button" id="individualCenter" value="Center" class="btn custom-btn2"> L: <label id="centerLXY">(0.0 , 0.0)</label> R: <label id="centerRXY">(0.0 , 0.0)</label> 
+								● Deadzone <input type="text" id="deadzone2" value="0" size="2" style="text-align: center;">%
+								● Round Lock <input type="checkbox" id="roundLock2">
+								<br>
+								● Edge Compensation (Draw 3 circles)
+								<input type="button" id="edgeBtnL" value="Left" class="btn custom-btn2"> <label id="edgeValueL">No Data</label>
+								<input type="button" id="edgeBtnR" value="Right" class="btn custom-btn2"> <label id="edgeValueR">No Data</label> 
+								
+							</div>
+						</div>
+					</div>
+
+				</div>
+				
+			</section>
+			
+		</main>
+        <!-- JAVASCRIPT FILES -->
+		<script src="src/analyzer.js" language="javascript"></script>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script src="js/jquery.sticky.js"></script>
+		
+        <script src="js/animated-headline.js"></script>
+        <script src="js/modernizr.js"></script>
+        <script src="js/custom.js"></script>
+
+    </body>
+</html>
