@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>雜訊超標紀錄</title>
+  <script src="js/chart.umd.min.js"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+
+    /* 頂部固定區域 */
+    #topPanel {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 22.5vh;
+      display: flex; background: #fff;
+      border-bottom: 2px solid #ccc;
+      z-index: 1000; padding: 10px; box-sizing: border-box;
+    }
+    #chartBox { flex: 1; margin-right: 10px; }
+    #detailBox {
+      flex: 1; border: 1px solid #ccc; background: #fafafa;
+      white-space: pre; font-family: monospace; overflow-y: auto; padding: 10px;
+    }
+
+    /* 下方表格 */
+    #content {
+      margin-top: 24vh; padding: 10px;
+      display: flex; justify-content: flex-start;
+      overflow-x: auto;  /* 水平滾動條 */
+    }
+
+    .directionTable {
+      flex: 0 0 auto;       /* 不縮放，保持最小寬度 */
+      min-width: 280px;     /* 表格最小寬度 */
+      margin-right: 10px;
+    }
+
+    .directionTable table {
+      border-collapse: collapse; width: 100%;
+    }
+    .directionTable th, .directionTable td {
+      border: 1px solid #ccc; padding: 6px 12px;
+      text-align: center; white-space: nowrap;
+    }
+    .directionTable tr:hover { background-color: #f0f0f0; cursor: pointer; }
+
+    h2 { text-align: center; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <!-- 固定頂部 -->
+  <div id="topPanel">
+    <div id="chartBox"><canvas id="chartCanvas"></canvas></div>
+    <div id="detailBox">點擊表格某一列以展開詳細 JSON</div>
+  </div>
+
+  <h2>雜訊超標紀錄</h2>
+
+  <!-- 下方表格 -->
+  <div id="content">
+    <div class="directionTable" id="dir1">
+      <table>
+        <thead>
+          <tr><th colspan="5">上</th></tr>
+          <tr><th>#</th><th>時間</th><th>Cycle</th><th>Max Noise</th><th>樣本數</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="directionTable" id="dir2">
+      <table>
+        <thead>
+          <tr><th colspan="5">右</th></tr>
+          <tr><th>#</th><th>時間</th><th>Cycle</th><th>Max Noise</th><th>樣本數</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="directionTable" id="dir3">
+      <table>
+        <thead>
+          <tr><th colspan="5">下</th></tr>
+          <tr><th>#</th><th>時間</th><th>Cycle</th><th>Max Noise</th><th>樣本數</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="directionTable" id="dir4">
+      <table>
+        <thead>
+          <tr><th colspan="5">左</th></tr>
+          <tr><th>#</th><th>時間</th><th>Cycle</th><th>Max Noise</th><th>樣本數</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const logs = JSON.parse(localStorage.getItem("noiseLogs0") || "[]");
+    const ctx = document.getElementById("chartCanvas").getContext("2d");
+    const detailBox = document.getElementById("detailBox");
+
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          { label: 'LifePoints X', data: [], borderColor: 'red', borderWidth: 2, pointRadius: 3, fill: false },
+          { label: 'LifePoints Y', data: [], borderColor: 'blue', borderWidth: 2, pointRadius: 3, fill: false }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        scales: { y: { min: -1, max: 1, title: { display: true, text: "Value" } }, x: { title: { display: true, text: "Sample Index" } } }
+      }
+    });
+
+    // 初始化每個方向的序號計數
+    const counters = {1:0,2:0,3:0,4:0};
+
+    logs.forEach((rec) => {
+      const dirId = Number(rec.direction);
+      const tbody = document.querySelector(`#dir${dirId} tbody`);
+      if (!tbody) return;
+
+      counters[dirId]++;  // 每個方向獨立計數
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${counters[dirId]}</td>
+        <td>${new Date(rec.timestamp).toLocaleString()}</td>
+        <td>${rec.cycle}</td>
+        <td>${rec.maxNoise}</td>
+        <td>${rec.points.length}</td>
+      `;
+
+      row.addEventListener("mouseenter", () => {
+        const labels = rec.points.map((_, idx) => idx+1);
+
+        // 計算最大雜訊及所在軸
+        let maxNoise = 0, maxIdx = 2, maxAxis = 'x';
+        for (let j = 2; j < rec.points.length; j++) {
+          const noiseX = (Math.abs((rec.points[j].x + rec.points[j-2].x)/2 - rec.points[j-1].x)/3)/2*3300;
+          const noiseY = (Math.abs((rec.points[j].y + rec.points[j-2].y)/2 - rec.points[j-1].y)/3)/2*3300;
+          const noise = Math.max(noiseX, noiseY);
+          if (noise > maxNoise) { maxNoise = noise; maxIdx = j; maxAxis = noiseX>noiseY?'x':'y'; }
+        }
+
+        const pointBgX = rec.points.map((_, idx)=> (maxAxis==='x' && (idx===maxIdx||idx===maxIdx-1||idx===maxIdx-2)) ? 'orange':'red');
+        const pointRadiusX = rec.points.map((_, idx)=> (maxAxis==='x' && (idx===maxIdx||idx===maxIdx-1||idx===maxIdx-2)) ? 6:3);
+        const pointBgY = rec.points.map((_, idx)=> (maxAxis==='y' && (idx===maxIdx||idx===maxIdx-1||idx===maxIdx-2)) ? 'orange':'blue');
+        const pointRadiusY = rec.points.map((_, idx)=> (maxAxis==='y' && (idx===maxIdx||idx===maxIdx-1||idx===maxIdx-2)) ? 6:3);
+
+        chart.data.labels = labels;
+        chart.data.datasets[0].data = rec.points.map(p=>p.x);
+        chart.data.datasets[1].data = rec.points.map(p=>p.y);
+        chart.data.datasets[0].pointBackgroundColor = pointBgX;
+        chart.data.datasets[0].pointRadius = pointRadiusX;
+        chart.data.datasets[1].pointBackgroundColor = pointBgY;
+        chart.data.datasets[1].pointRadius = pointRadiusY;
+        chart.update();
+      });
+
+      row.addEventListener("click", () => { detailBox.textContent = JSON.stringify(rec, null, 2); });
+
+      tbody.appendChild(row);
+    });
+  </script>
+</body>
+</html>
