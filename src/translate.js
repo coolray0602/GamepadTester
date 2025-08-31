@@ -127,7 +127,7 @@ const translations = {
 		noFill: "不上色",
 		max: "上限",
 		sample: "進行採樣",
-		rotateUL: "從右上角開始順時針旋轉測試。",
+		rotateUL: "請從右上角開始順時針旋轉測試。",
 		sampleRing: "使用自動採樣環",
 		startTest: "開始測試(空白鍵)",
 		autoRetest: "自動重測",
