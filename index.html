@@ -76,9 +76,9 @@
 								<canvas id="gamepadImg" height="250" width="300"></canvas>
 								<br>
 								<h5 style="text-align: right; margin-right: 150px;" class="white-font"><span data-key="lj">左搖桿</span>&nbsp;<input type="checkbox" id="showLeft" checked> &nbsp;&nbsp; <span data-key="rj">右搖桿</span><input type="checkbox" id="showRight" checked></h5>
-								<h5 style="text-align: right; margin-right: 170px;" class="white-font">
-									<span data-key="xSwap">x軸(左右)對調</span> <input type="checkbox" id="xReverse"><br>
-									<span data-key="ySwap">y軸(上下)對調</span> <input type="checkbox" id="yReverse">
+								<h5 style="text-align: right; margin-right: 130px;" class="white-font">
+									<span data-key="xSwap">x軸(左右)對調</span> <input type="checkbox" id="xReverse">&nbsp;&nbsp; <span data-key="xAxis">x</span> <input type="checkbox" id="xAxis" checked><br>
+									<span data-key="ySwap">y軸(上下)對調</span> <input type="checkbox" id="yReverse">&nbsp;&nbsp; <span data-key="yAxis">y</span> <input type="checkbox" id="yAxis" checked>
 								</h5>
 						</div>
 						<div class="col-4">
@@ -114,7 +114,7 @@
 										<canvas id="left-joystick-wobble" style="border:1px solid; position: absolute; left: 0; top: 0;" width="300" height="300"></canvas>
 									</div>	
 									<div>
-										<span data-key="track">顯示軌跡</span> <input type="checkbox" id="track0">&emsp;&emsp; 定時清空: <input type="text" id="cleanTrack0" value="1"  style="text-align: center; width: 40px;"> 秒
+										<span data-key="track">顯示軌跡</span> <input type="checkbox" id="track0" checked>&emsp;&emsp; <span data-key="cleanTrack">定時清空</span>: <input type="text" id="cleanTrack0" value="1"  style="text-align: center; width: 40px;"> <span data-key="sec">秒</span>
 										<p><label id="left-x-axes" style="width: 100px; display: inline-block;"></label> <label id="left-y-axes" style="width: 100px; display: inline-block;"></label></p>
 									</div>
 
@@ -167,47 +167,70 @@
 									<thead>
 										<tr>
 											<th></th>
-											<th>測試次数</th>
-											<th>此次杂音</th>
-											<th>最大杂音</th>
-											<th>超標次数</th>
+											<th>No.</th>
+											<th class="typeA" data-key="noise">雜音</th>
+											<th class="typeA">MAX</th>
+											<th class="typeA">NG</th>
+											<th class="typeB" data-key="interference">其它軸</th>
+											<th class="typeB">MAX</th>
+											<th class="typeB">NG</th>
 										</tr>
 									</thead>
 									<tbody>
 										<tr>
-											<td class="direction">上</td>
+											<td class="direction" data-key="up">上</td>
 											<td><label id="life01">0</label></td>
 											<td><label id="noise01">0</label> mV</td>
 											<td><label id="maxNoise01">0</label> mV</td>
 											<td><label id="noiseCount01">0</label></td>
+											<td><label id="affect01">0</label> %</td>
+											<td><label id="maxAffect01">0</label> %</td>
+											<td><label id="affectCount01">0</label></td>
 										</tr>
 										<tr>
-											<td class="direction">下</td>
+											<td class="direction" data-key="down">下</td>
 											<td><label id="life03">0</label></td>
 											<td><label id="noise03">0</label> mV</td>
 											<td><label id="maxNoise03">0</label> mV</td>
 											<td><label id="noiseCount03">0</label></td>
+											<td><label id="affect03">0</label> %</td>
+											<td><label id="maxAffect03">0</label> %</td>
+											<td><label id="affectCount03">0</label></td>
 											
 										</tr>
 										<tr>
-											<td class="direction">左</td>
+											<td class="direction" data-key="left">左</td>
 											<td><label id="life04">0</label></td>
 											<td><label id="noise04">0</label> mV</td>
 											<td><label id="maxNoise04">0</label> mV</td>
 											<td><label id="noiseCount04">0</label></td>
-											
+											<td><label id="affect04">0</label> %</td>
+											<td><label id="maxAffect04">0</label> %</td>
+											<td><label id="affectCount04">0</label></td>
 										</tr>
 										<tr>
-											<td class="direction">右</td>
+											<td class="direction" data-key="right">右</td>
 											<td><label id="life02">0</label></td>
 											<td><label id="noise02">0</label> mV</td>
 											<td><label id="maxNoise02">0</label> mV</td>
 											<td><label id="noiseCount02">0</label></td>
-											
+											<td><label id="affect02">0</label> %</td>
+											<td><label id="maxAffect02">0</label> %</td>
+											<td><label id="affectCount02">0</label></td>
+										</tr>
+										<tr>
+											<td class="direction" data-key="sw">開關</td>
+											<td><label id="lifeSW0">0</label></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
 										</tr>
 									</tbody>
 								</table>
-								<center><button id="clearTable0">清空</button> <a href="liferesult.html" target="_blank">詳細數據</a></center>
+								<center><button id="clearTable0" data-key="clear">清空</button>&nbsp;&nbsp;&nbsp;<a href="liferesult.html" target="_blank" data-key="detail">詳細數據</a></center>
 							</div>
 						</div>
 						
@@ -222,7 +245,7 @@
 										<canvas id="right-joystick-wobble" style="border:1px solid; position: absolute; left: 0; top: 0;" width="300" height="300"></canvas>
 									</div>
 									<div>
-										<span data-key="track">顯示軌跡</span> <input type="checkbox" id="track2">&emsp;&emsp; 定時清空: <input type="text" id="cleanTrack2" value="1"  style="text-align: center; width: 40px;"> 秒
+										<span data-key="track">顯示軌跡</span> <input type="checkbox" id="track2" checked>&emsp;&emsp; <span data-key="cleanTrack">定時清空</span>: <input type="text" id="cleanTrack2" value="1"  style="text-align: center; width: 40px;"> <span data-key="sec">秒</span>
 										<p><label id="right-x-axes" style="width: 100px; display: inline-block;"></label> <label id="right-y-axes" style="width: 100px; display: inline-block;"></label></p>
 									</div>
 								</div>
@@ -274,44 +297,69 @@
 									<thead>
 										<tr>
 											<th></th>
-											<th>測試次数</th>
-											<th>此次杂音</th>
-											<th>最大杂音</th>
-											<th>超標次数</th>
+											<th>No.</th>
+											<th class="typeA" data-key="noise">雜音</th>
+											<th class="typeA">MAX</th>
+											<th class="typeA">NG</th>
+											<th class="typeB" data-key="interference">其它軸</th>
+											<th class="typeB">MAX</th>
+											<th class="typeB">NG</th>
 										</tr>
 									</thead>
 									<tbody>
 										<tr>
-											<td class="direction">上</td>
+											<td class="direction" data-key="up">上</td>
 											<td><label id="life21">0</label></td>
 											<td><label id="noise21">0</label> mV</td>
 											<td><label id="maxNoise21">0</label> mV</td>
 											<td><label id="noiseCount21">0</label></td>
+											<td><label id="affect21">0</label> %</td>
+											<td><label id="maxAffect21">0</label> %</td>
+											<td><label id="affectCount21">0</label></td>
 										</tr>
 										<tr>
-											<td class="direction">下</td>
+											<td class="direction" data-key="down">下</td>
 											<td><label id="life23">0</label></td>
 											<td><label id="noise23">0</label> mV</td>
 											<td><label id="maxNoise23">0</label> mV</td>
 											<td><label id="noiseCount23">0</label></td>
+											<td><label id="affect23">0</label> %</td>
+											<td><label id="maxAffect23">0</label> %</td>
+											<td><label id="affectCount23">0</label></td>
 										</tr>
 										<tr>
-											<td class="direction">左</td>
+											<td class="direction" data-key="left">左</td>
 											<td><label id="life24">0</label></td>
 											<td><label id="noise24">0</label> mV</td>
 											<td><label id="maxNoise24">0</label> mV</td>
 											<td><label id="noiseCount24">0</label></td>
+											<td><label id="affect24">0</label> %</td>
+											<td><label id="maxAffect24">0</label> %</td>
+											<td><label id="affectCount24">0</label></td>
 										</tr>
 										<tr>
-											<td class="direction">右</td>
+											<td class="direction" data-key="right">右</td>
 											<td><label id="life22">0</label></td>
 											<td><label id="noise22">0</label> mV</td>
 											<td><label id="maxNoise22">0</label> mV</td>
 											<td><label id="noiseCount22">0</label></td>
+											<td><label id="affect22">0</label> %</td>
+											<td><label id="maxAffect22">0</label> %</td>
+											<td><label id="affectCount22">0</label></td>
+										</tr>
+										<tr>
+											<td class="direction" data-key="sw">開關</td>
+											<td><label id="lifeSW2">0</label></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
+											<td></td>
 										</tr>
 									</tbody>
 								</table>
-								<center><button id="clearTable2">清空</button> <a href="liferesult2.html" target="_blank">詳細數據</a></center>
+								<center><button id="clearTable2" data-key="clear">清空</button>&nbsp;&nbsp;&nbsp;<a href="liferesult2.html" target="_blank" data-key="detail">詳細數據</a></center>
 							</div>
 						</div>
 					</div>
@@ -330,9 +378,11 @@
 									•<span data-key="roundness" title="中間百分比表示搖桿擺動可達範圍佔正圓的比例，&#10;超出或不足都會減少百分比">Roundness Test</span> <input type="checkbox" id="roundnessTestCB1">
 								</h3>
 								<h4>
-									&emsp;&emsp;<span data-key="range">Range </span>: <input type="text" id="outputLow1" value="120"  style="text-align: center; width: 50px;height: 19px;"> to <input type="text" id="output1" value="50"  style="text-align: center; width: 50px;height: 19px;"> %<br>
-									&emsp;&emsp;<span data-key="maxDV">上分壓</span> <label id="dvMaxUp1">0.0</label> % ~ <label id="dvMaxDown1">0.0</label> %<br>
-									&emsp;&emsp;<span data-key="minDV">下分壓</span> <label id="dvMinUp1">0.0</label> % ~ <label id="dvMinDown1">0.0</label> %<br> 
+									&emsp;&emsp;<span data-key="range">Range </span>: <input type="text" id="output1" value="50"  style="text-align: center; width: 50px;height: 19px;"> to <input type="text" id="outputLow1" value="120"  style="text-align: center; width: 50px;height: 19px;"> %<br>
+									&emsp;&emsp;<span data-key="maxDV">上分壓</span> <label id="dvMaxDown1">0.0</label> % ~ <label id="dvMaxUp1">0.0</label> %<br>
+									&emsp;&emsp;<span data-key="minDV">下分壓</span> <label id="dvMinDown1">0.0</label> % ~ <label id="dvMinUp1">0.0</label> %<br> 
+									&emsp;&emsp;<span data-key="rangeDV" title="單軸的最大最小分壓差需在規定上下限範圍內">雙邊行程：</span> <input type="text" id="rangeDV1" value="40"  style="text-align: center; width: 50px;height: 19px;"> to <input type="text" id="rangeDV2" value="100"  style="text-align: center; width: 50px;height: 19px;"> %<br>
+									&emsp;&emsp;<span data-key="onesideDV" title="各方向的最大或最小分壓與該方向的複歸分壓的差值需大於規定的單邊行程">單邊行程 ≧ </span> <input type="text" id="onesideDV" value="21"  style="text-align: center; width: 50px;height: 19px;"> %<br>
 									&emsp;&emsp;<span data-key="only4">只測四方向</span> <input type="checkbox" id="only4"> <br>
 									&emsp;&emsp;<span data-key="noFill">不上色</span> <input type="checkbox" id="noColor">
 								</h4>
@@ -343,14 +393,14 @@
 								•<span data-key="staticNoise" title="勾選後不要動搖桿，以測試靜止狀態的紋波雜訊，&#10;一般只有非接觸式搖桿才存在靜態雜訊">Static Noise Test</span> <input type="checkbox" id="staticNoiseTest">
 							</h3>
 							<h4>
-								&emsp;&emsp;<span data-key="max">上限</span>：<input type="text" id="noiseStd" value="2"  style="text-align: center;  width: 50px;height: 19px;"> %<br>
+								&emsp;&emsp;<span data-key="staticNoiseMax">上限</span><input type="text" id="noiseStd" value="2"  style="text-align: center;  width: 50px;height: 19px;"> %<br>
 								&emsp;&emsp;<span data-key="sample">進行採樣</span> <input type="checkbox" id="staticNoiseCB1">
 							</h4>
 							<h3>
 								•<span data-key="slideNoise" title="針對接觸式搖桿(碳膜)的「峰到峰」的滑動雜音測試，需擺動搖桿來完成測試，&#10;因瀏覽器幀率限制，此項測試不夠嚴謹，不建議使用">Slide Noise Test</span> <input type="checkbox" id="slideNoiseCB1">
 							</h3>
 							<h4>
-								&emsp;&emsp;<span data-key="max">上限</span>：<input type="text" id="slideNoiseStd" value="300"  style="text-align: center;  width: 50px;height: 19px;"> mV
+								&emsp;&emsp;<span data-key="slideNoiseMax">上限</span><input type="text" id="slideNoiseStd" value="300"  style="text-align: center;  width: 50px;height: 19px;"> mV
 							</h4>
 							<h3>
 								•<span data-key="directionCheck" title="可檢查霍爾搖桿的磁鐵方向是否裝反，&#10;對碳膜搖桿而言此項測試沒有意義">Direction Check</span> <input type="checkbox" id="directionCheck"><br>
@@ -365,8 +415,9 @@
 								•<span data-key="wobbleTest" title="讓搖桿光標停留在各方向的扇形內達0.3秒以上，&#10;在扇形變綠後複歸至中心點，測量各方向的複歸精度">Wobble Check</span> <input type="checkbox" id="wobbleCB0">
 							</h3>							
 							<h4>
-								&emsp;&emsp;<span data-key="max">上限</span>：<input type="text" id="returnStd" value="3"  style="text-align: center; width: 50px;height: 19px;"> %<br>
-								&emsp;&emsp;<span data-key="sampleRing">使用自動採樣環</span> <input type="checkbox" id="autoRing"><br>
+								&emsp;&emsp;<span data-key="rangeMax" title="兩個不同方向的複歸值的相減值，必須小於這個上限值才算合格">範圍上限</span>：<input type="text" id="returnStd" value="3"  style="text-align: center; width: 50px;height: 19px;"> %<br>
+								&emsp;&emsp;<span data-key="returnErr" title="每個方向的複歸值都必須在50%+/-這個公差範圍內">單向公差: 50% ± </span><input type="text" id="returnErr" value="9"  style="text-align: center; width: 50px;height: 19px;"> %<br>
+								&emsp;&emsp;<span data-key="sampleRing" title="使用這個環的話，搖桿擺動至各方向的環內，使其變色後在0.5秒內複歸到中心並自動取複歸值，不使用的話，複歸後按方向鍵告知測試軟件完成該方向的複歸並取值，可以設定這個環的大小，為確保慢速複歸，環的大小不建議設定太大">使用自動採樣環</span> <input type="checkbox" id="autoRing"><br>
 								&emsp;&emsp;<input type="text" id="ringLow" value="10"  style="text-align: center; width: 50px;height: 19px;"> % ~ <input type="text" id="ringUp" value="30"  style="text-align: center; width: 50px;height: 19px;"> %
 							</h4>
 							<h3>
@@ -374,7 +425,7 @@
 							</h3>
 							<h4>
 								&emsp;&emsp;<span data-key="useReturnCenter">採用複歸中心計算</span> <input type="checkbox" id="useReturnCenter"><br>
-								&emsp;&emsp;<span data-key="max">上限</span>：<input type="text" id="balanceErr" value="10" style="text-align: center; width: 50px;height: 19px;"> %
+								&emsp;&emsp;<span data-key="balanceErr">上限</span><input type="text" id="balanceErr" value="10" style="text-align: center; width: 50px;height: 19px;"> %
 							</h4>
 							<h3>
 								•<span data-key="switchTest">開關測試</span> <input type="checkbox" id="switchTestCB">
@@ -382,12 +433,13 @@
 						</div>
 						<div class="col-3">
 							<h3>
-								•單向壽命測試
+								•<span data-key="singleDirectionLifeTest" title="測試時四個方向要分別測試，不適用於繞圈式的壽命測試">單向壽命測試</span>
 							</h3>
 							<h4>
-								&emsp;&emsp;左搖桿 <input type="checkbox" id="lifeTest0"> 右搖桿 <input type="checkbox" id="lifeTest2"> <br>
-								&emsp;&emsp;範圍：<input type="text" id="lifeRangeBegin" value="10"  style="text-align: center; width: 50px; height: 19px;"> % ~ <input type="text" id="lifeRangeEnd" value="60"  style="text-align: center; width: 50px; height: 19px;"> %<br>
-								&emsp;&emsp;雜訊上限：<input type="text" id="lifeNoiseStd" value="300"  style="text-align: center; width: 50px; height: 19px;"> mV
+								&emsp;&emsp;<span data-key="LJoystick">左搖桿</span> <input type="checkbox" id="lifeTest0"> <span data-key="RJoystick">右搖桿</span> <input type="checkbox" id="lifeTest2"> <br>
+								&emsp;&emsp;<span data-key="testRange">範圍</span>：<input type="text" id="lifeRangeBegin" value="10"  style="text-align: center; width: 50px; height: 19px;"> % ~ <input type="text" id="lifeRangeEnd" value="40"  style="text-align: center; width: 50px; height: 19px;"> %<br>
+								&emsp;&emsp;<span data-key="noiseMax">雜訊上限</span>：<input type="text" id="lifeNoiseStd" value="300"  style="text-align: center; width: 50px; height: 19px;"> mV <br>
+								&emsp;&emsp;<span data-key="affectAxis">影響其他軸輸出</span> &lt; <input type="text" id="affectStd" value="9"  style="text-align: center; width: 50px; height: 19px;"> %
 							</h4>
 						</div>
 					</div>
@@ -534,56 +586,50 @@
 					<hr>
 					<div class="row" >
 						<div class="col-6 row" style="display: flex; align-items: center;" id="leftInfo">
-							<div class="col-1" >
-								X：
-							</div>
-							<div class="col-5" >
-								<span data-key="maxDV">最大分壓</span>：<label id="max0"></label><br>
-								<span data-key="nowDV">現在分壓</span>：<label id="now0"></label><br>
-								<span data-key="minDV">最小分壓</span>：<label id="min0"></label><br>
-								<span data-key="leftDV">左複歸分壓</span>：<label id="xLeft1"></label><br>
-								<span data-key="rightDV">右複歸分壓</span>：<label id="xRight1"></label><br>
-								<span data-key="returnAccuracy">複歸精度</span>：<label id="xLR1"></label>
-							</div>
-							<div class="col-1">
-								Y：
-							</div>
-							<div class="col-5">
-								<span data-key="maxDV">最大分壓</span>：<label id="max1"></label><br>
-								<span data-key="nowDV">現在分壓</span>：<label id="now1"></label><br>
-								<span data-key="minDV">最小分壓</span>：<label id="min1"></label><br>
-								<span data-key="upDV">上複歸分壓</span>：<label id="yUp1"></label><br>
-								<span data-key="downDV">下複歸分壓</span>：<label id="yDown1"></label><br>
-								<span data-key="returnAccuracy">複歸精度</span>：<label id="yUD1"></label>
-							</div>
-							<center><a href="results.html" target="_blank" id="viewResults"><span data-key="checkSaved">查看已存數據</span></a></center>
+						<div class="col-1">X：</div>
+						<div class="col-5">
+							<div class="row-line"><span data-key="maxDV">最大分壓</span><label id="max0"></label></div>
+							<div class="row-line"><span data-key="nowDV">現在分壓</span><label id="now0"></label></div>
+							<div class="row-line"><span data-key="minDV">最小分壓</span><label id="min0"></label></div>
+							<div class="row-line"><span data-key="leftDV">左複歸分壓</span><label id="xLeft1"></label></div>
+							<div class="row-line"><span data-key="rightDV">右複歸分壓</span><label id="xRight1"></label></div>
+							<div class="row-line"><span data-key="returnAccuracy">複歸精度</span><label id="xLR1"></label></div>
 						</div>
+
+						<div class="col-1">Y：</div>
+						<div class="col-5">
+							<div class="row-line"><span data-key="maxDV">最大分壓</span><label id="max1"></label></div>
+							<div class="row-line"><span data-key="nowDV">現在分壓</span><label id="now1"></label></div>
+							<div class="row-line"><span data-key="minDV">最小分壓</span><label id="min1"></label></div>
+							<div class="row-line"><span data-key="upDV">上複歸分壓</span><label id="yUp1"></label></div>
+							<div class="row-line"><span data-key="downDV">下複歸分壓</span><label id="yDown1"></label></div>
+							<div class="row-line"><span data-key="returnAccuracy">複歸精度</span><label id="yUD1"></label></div>
+						</div>
+						<center><a href="results.html" target="_blank" id="viewResults"><span data-key="checkSaved">查看已存數據</span></a></center>
+						</div>
+
 						<div class="col-6 row" style="display: flex; align-items: center;" id="rightInfo">
-							<div class="col-1" >
-								X：
-							</div>
-							<div class="col-5" >
-								<span data-key="maxDV">最大分壓</span>：<label id="max2"></label><br>
-								<span data-key="nowDV">現在分壓</span>：<label id="now2"></label><br>
-								<span data-key="minDV">最小分壓</span>：<label id="min2"></label><br>
-								<span data-key="leftDV">左複歸分壓</span>：<label id="xLeft2"></label><br>
-								<span data-key="rightDV">右複歸分壓</span>：<label id="xRight2"></label><br>
-								<span data-key="returnAccuracy">複歸精度</span>：<label id="xLR2"></label>
-							</div>
-							<div class="col-1">
-								Y：
-							</div>
-							<div class="col-5">
-								<span data-key="maxDV">最大分壓</span>：<label id="max3"></label><br>
-								<span data-key="nowDV">現在分壓</span>：<label id="now3"></label><br>
-								<span data-key="minDV">最小分壓</span>：<label id="min3"></label><br>
-								<span data-key="upDV">上複歸分壓</span>：<label id="yUp2"></label><br>
-								<span data-key="downDV">下複歸分壓</span>：<label id="yDown2"></label><br>
-								<span data-key="returnAccuracy">複歸精度</span>：<label id="yUD2"></label>
-							</div>
-							<center><a href="results2.html" target="_blank" id="viewResults"><span data-key="checkSaved">查看結果</span></a>
+						<div class="col-1">X：</div>
+						<div class="col-5">
+							<div class="row-line"><span data-key="maxDV">最大分壓</span><label id="max2"></label></div>
+							<div class="row-line"><span data-key="nowDV">現在分壓</span><label id="now2"></label></div>
+							<div class="row-line"><span data-key="minDV">最小分壓</span><label id="min2"></label></div>
+							<div class="row-line"><span data-key="leftDV">左複歸分壓</span><label id="xLeft2"></label></div>
+							<div class="row-line"><span data-key="rightDV">右複歸分壓</span><label id="xRight2"></label></div>
+							<div class="row-line"><span data-key="returnAccuracy">複歸精度</span><label id="xLR2"></label></div>
 						</div>
-						
+
+						<div class="col-1">Y：</div>
+						<div class="col-5">
+							<div class="row-line"><span data-key="maxDV">最大分壓</span><label id="max3"></label></div>
+							<div class="row-line"><span data-key="nowDV">現在分壓</span><label id="now3"></label></div>
+							<div class="row-line"><span data-key="minDV">最小分壓</span><label id="min3"></label></div>
+							<div class="row-line"><span data-key="upDV">上複歸分壓</span><label id="yUp2"></label></div>
+							<div class="row-line"><span data-key="downDV">下複歸分壓</span><label id="yDown2"></label></div>
+							<div class="row-line"><span data-key="returnAccuracy">複歸精度</span><label id="yUD2"></label></div>
+						</div>
+						<center><a href="results2.html" target="_blank" id="viewResults"><span data-key="checkSaved">查看結果</span></a></center>
+						</div>
 					</div>
 					<center><button id="resetButton">Reset</button> &nbsp;&nbsp;<button id="saveButton"><span data-key="saveData">保存數據(Enter鍵)</span></button> <span data-key="saveOnSwitch">測試開關功能時保存</span><input type="checkbox" id="swSave"></center>
 				</div>

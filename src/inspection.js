@@ -238,6 +238,9 @@ window.addEventListener("gamepadconnected", (event) => {
 		}
 		//t2=setInterval("joystick2.changeState()",16); 
 		// 啟動遊戲循環
+		joystick1.loadStats();
+		joystick2.loadStats();
+		
 		gameLoop();
 		var timestampTimer = setInterval("updateTimestamp()",1000);
 		//var replaceCheck=setInterval("checkReplace()",500);
@@ -547,13 +550,19 @@ clearBtn0.onclick=function(){
 	joystick1.lifeCycleCount=[0,0,0,0,0];
 	joystick1.lifeNoiseCount=[0,0,0,0,0];
 	joystick1.lifeMaxNoise=[0,0,0,0,0];
+	joystick1.lifeMaxAffected=[0,0,0,0,0];
+	joystick1.lifeAffectCount=[0,0,0,0,0];
+	joystick1.swLife=0;
+	document.getElementById("lifeSW0").innerHTML=0;
 	for(let i=1;i<=4;i++){
 		document.getElementById("life0"+i).innerHTML=0;
 		document.getElementById("noiseCount0"+i).innerHTML=0;
 		document.getElementById("noise0"+i).innerHTML=0;
 		document.getElementById("maxNoise0"+i).innerHTML=0;
+		
 	}
 	localStorage.removeItem('noiseLogs0');
+	joystick1.clearStats();
 	alert('此搖桿壽命測試數據已清空。');
 }
 
@@ -562,6 +571,12 @@ clearBtn2.onclick=function(){
 	joystick2.lifeCycleCount=[0,0,0,0,0];
 	joystick2.lifeNoiseCount=[0,0,0,0,0];
 	joystick2.lifeMaxNoise=[0,0,0,0,0];
+	joystick2.lifeMaxAffected=[0,0,0,0,0];
+	joystick2.lifeAffectCount=[0,0,0,0,0];
+	joystick2.swLife=0;
+	document.getElementById("lifeSW2").innerHTML=0;
+	joystick2.swLife=0;
+	document.getElementById("lifeSW2").innerHTML=0;
 	for(let i=1;i<=4;i++){
 		document.getElementById("life2"+i).innerHTML=0;
 		document.getElementById("noiseCount2"+i).innerHTML=0;
@@ -569,6 +584,7 @@ clearBtn2.onclick=function(){
 		document.getElementById("maxNoise2"+i).innerHTML=0;
 	}
 	localStorage.removeItem('noiseLogs2');
+	joystick2.clearStats();
 	alert('此搖桿壽命測試數據已清空。');
 }
 
@@ -875,17 +891,17 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 		this.staticY=0;		
 		this.originX=0;	//測複歸精度的中心點
 		this.originY=0;		
-		this.leftx=0;
+		this.leftx=0;	//回中按鍵記錄值
 		this.rightx=0;
 		this.lefty=0;
 		this.righty=0;		
 		this.bgColor="white";
 		this.directionPass=0;
-		this.xMax=0;
+		this.xMax=0;	//記錄最大值
 		this.xMin=0;
 		this.yMax=0;
 		this.yMin=0;
-		this.swLastStatus=0;
+
 		this.x=gamepads[focusGamepad].axes[this.xAxesNumber];
 		this.y=gamepads[focusGamepad].axes[this.yAxesNumber];
 		this.lastTrackx=-100;
@@ -898,7 +914,7 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 		this.lasty=[this.y,this.y];
 		this.xMaxSlideNoise=0;	//記錄最大雜音值
 		this.yMaxSlideNoise=0;
-		this.balancePass=false;
+		this.balancePass=true;
 		this.cleanTime=new Date();
 		this.points = []; // 存储点数据：{x, y, timestamp}
 		this.lifeDirection=0; //測試中方向，0：歸中，1：上，2：右，3：下，4：左
@@ -906,6 +922,12 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 		this.lifeCycleCount = [0,0,0,0,0];
 		this.lifeNoiseCount = [0,0,0,0,0];
 		this.lifeMaxNoise = [0,0,0,0,0];
+		this.lifeMaxAffect = [0,0,0,0,0];
+		this.lifeAffectCount = [0,0,0,0,0];
+		this.lifeXMax=0;
+		this.lifeYMax=0;
+		this.swLife = 0;
+		this.swLastStatus=false;
 	}
 	
 	changeState(){ 
@@ -930,6 +952,14 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 			if(document.getElementById("yReverse").checked){
 				this.y*=-1;
 			}
+
+			if(!document.getElementById("xAxis").checked){
+				this.x=0;
+			}
+			if(!document.getElementById("yAxis").checked){
+				this.y=0;
+			}
+
 			if(this.xAxesNumber==0)	{	//只在左搖桿時作的事
 				//console.log("x= "+this.x.toFixed(5)+" , y= "+this.y.toFixed(5));
 				
@@ -968,19 +998,29 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 						myBtn[m]=gamepads[focusGamepad].buttons[m].value;
 					}
 					if (myBtn[10]) {
+						if(joystick1.swLastStatus==false && document.getElementById("lifeTest0").checked){
+							joystick1.swLife++;
+							joystick1.swLastStatus=true;
+							document.getElementById("lifeSW0").innerHTML=joystick1.swLife;
+							joystick1.saveStats();
+						}
+						
 						if(testL[5]!=1 && document.getElementById("swSave").checked){
+
 							var data1 = (joystick1.x*50+50).toFixed(2);
 							var data2 = (joystick1.xMax*50+50).toFixed(2);
 							var data3 = (joystick1.xMin*50+50).toFixed(2);
 							var data4 = (joystick1.leftx*50+50).toFixed(2);
 							var data5 = (joystick1.rightx*50+50).toFixed(2);
 							var data6 = (Math.abs(joystick1.leftx-joystick1.rightx)*50).toFixed(2);
-							var data7 = (joystick1.y*50+50).toFixed(2);
-							var data8 = (joystick1.yMax*50+50).toFixed(2);
-							var data9 = (joystick1.yMin*50+50).toFixed(2);
-							var data10 = (joystick1.lefty*50+50).toFixed(2);
-							var data11 = (joystick1.righty*50+50).toFixed(2);
-							var data12 = (Math.abs(joystick1.lefty-joystick1.righty)*50).toFixed(2);
+							var data7 = (joystick1.xMaxSlideNoise/2*3300).toFixed(2);
+							var data8 = (joystick1.y*50+50).toFixed(2);
+							var data9 = (joystick1.yMax*50+50).toFixed(2);
+							var data10 = (joystick1.yMin*50+50).toFixed(2);
+							var data11 = (joystick1.lefty*50+50).toFixed(2);
+							var data12 = (joystick1.righty*50+50).toFixed(2);
+							var data13 = (Math.abs(joystick1.lefty-joystick1.righty)*50).toFixed(2);
+							var data14 = (joystick1.yMaxSlideNoise/2*3300).toFixed(2);
 							
 							const testResult = {
 								//左搖桿
@@ -991,12 +1031,14 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 								data4,	//左複歸
 								data5,	//右複歸
 								data6,	//左右複歸
-								data7,	//y分壓
-								data8,	//y最大
-								data9,	//y最小
-								data10,	//上複歸
-								data11,	//下複歸
-								data12	//上下複歸
+								data7,	//x滑動雜訊
+								data8,	//y分壓
+								data9,	//y最大
+								data10,	//y最小
+								data11,	//上複歸
+								data12,	//下複歸
+								data13,	//上下複歸
+								data14	//y滑動雜訊
 							};
 							
 							// 從localStorage獲取現有數據或初始化空數組
@@ -1007,10 +1049,26 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							
 							// 保存回localStorage
 							localStorage.setItem('testResults', JSON.stringify(savedResults));
+							const toast = document.getElementById('toast');
+							// 顯示toast
+							toast.classList.add('show');
+							// 3秒後自動隱藏
+							setTimeout(() => {
+								toast.classList.remove('show');
+							}, 3000);
 						}
 						testDone("L",5,1);
+					}else{
+						joystick1.swLastStatus=false;
 					}
 					if (myBtn[11]) {
+						if(joystick2.swLastStatus==false && document.getElementById("lifeTest2").checked){
+							joystick2.swLife++;
+							joystick2.swLastStatus=true;
+							document.getElementById("lifeSW2").innerHTML=joystick2.swLife;
+							joystick2.saveStats();
+						}
+
 						if(testR[5]!=1 && document.getElementById("swSave").checked){
 							var data1 = (joystick2.x*50+50).toFixed(2);
 							var data2 = (joystick2.xMax*50+50).toFixed(2);
@@ -1018,12 +1076,14 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							var data4 = (joystick2.leftx*50+50).toFixed(2);
 							var data5 = (joystick2.rightx*50+50).toFixed(2);
 							var data6 = (Math.abs(joystick2.leftx-joystick2.rightx)*50).toFixed(2);
-							var data7 = (joystick2.y*50+50).toFixed(2);
-							var data8 = (joystick2.yMax*50+50).toFixed(2);
-							var data9 = (joystick2.yMin*50+50).toFixed(2);
-							var data10 = (joystick2.lefty*50+50).toFixed(2);
-							var data11 = (joystick2.righty*50+50).toFixed(2);
-							var data12 = (Math.abs(joystick2.lefty-joystick2.righty)*50).toFixed(2);
+							var data7 = (joystick2.xMaxSlideNoise/2*3300).toFixed(2);
+							var data8 = (joystick2.y*50+50).toFixed(2);
+							var data9 = (joystick2.yMax*50+50).toFixed(2);
+							var data10 = (joystick2.yMin*50+50).toFixed(2);
+							var data11 = (joystick2.lefty*50+50).toFixed(2);
+							var data12 = (joystick2.righty*50+50).toFixed(2);
+							var data13 = (Math.abs(joystick2.lefty-joystick2.righty)*50).toFixed(2);
+							var data14 = (joystick2.yMaxSlideNoise/2*3300).toFixed(2);
 							
 							const testResult2 = {
 								//右搖桿
@@ -1034,12 +1094,14 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 								data4,	//左複歸
 								data5,	//右複歸
 								data6,	//左右複歸
-								data7,	//y分壓
-								data8,	//y最大
-								data9,	//y最小
-								data10,	//上複歸
-								data11,	//下複歸
-								data12	//上下複歸
+								data7,	//x滑動雜訊
+								data8,	//y分壓
+								data9,	//y最大
+								data10,	//y最小
+								data11,	//上複歸
+								data12,	//下複歸
+								data13,	//上下複歸
+								data14	//y滑動雜訊
 							};
 							
 							// 從localStorage獲取現有數據或初始化空數組
@@ -1050,8 +1112,17 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							
 							// 保存回localStorage
 							localStorage.setItem('testResults2', JSON.stringify(savedResults2));
+							const toast = document.getElementById('toast');
+							// 顯示toast
+							toast.classList.add('show');
+							// 3秒後自動隱藏
+							setTimeout(() => {
+								toast.classList.remove('show');
+							}, 3000);
 						}
 						testDone("R",5,1);
+					}else{
+						joystick2.swLastStatus=false;
 					}
 
 					if(isSwitch) {
@@ -1425,9 +1496,31 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 					}else if(this.y<-maxBound){
 						this.lifeDirection=1;
 					}else if(this.x<minBound && this.x>-minBound && this.y<minBound && this.y>-minBound){
-						var maxNoise=0;
-						
 						if(this.lifeDirection>0){
+							var affectStd=parseFloat(document.getElementById("affectStd").value);
+							if(this.lifeDirection==1 || this.lifeDirection==3){
+								document.getElementById("affect"+this.xAxesNumber+""+this.lifeDirection).innerHTML=(this.lifeXMax*50).toFixed(2);
+								if(this.lifeXMax*50>this.lifeMaxAffect[this.lifeDirection]){
+									this.lifeMaxAffect[this.lifeDirection]=this.lifeXMax*50;
+									document.getElementById("maxAffect"+this.xAxesNumber+""+this.lifeDirection).innerHTML=(this.lifeXMax*50).toFixed(2);
+								}
+								if(this.lifeXMax*50>affectStd){
+									this.lifeAffectCount[this.lifeDirection]++;
+									document.getElementById("affectCount"+this.xAxesNumber+""+this.lifeDirection).innerHTML=this.lifeAffectCount[this.lifeDirection];
+								}
+							}else if(this.lifeDirection==2 || this.lifeDirection==4){
+								document.getElementById("affect"+this.xAxesNumber+""+this.lifeDirection).innerHTML=(this.lifeYMax*50).toFixed(2);
+								if(this.lifeYMax*50>this.lifeMaxAffect[this.lifeDirection]){
+									this.lifeMaxAffect[this.lifeDirection]=this.lifeYMax*50;
+									document.getElementById("maxAffect"+this.xAxesNumber+""+this.lifeDirection).innerHTML=(this.lifeYMax*50).toFixed(2);
+								}
+								if(this.lifeYMax*50>affectStd){
+									this.lifeAffectCount[this.lifeDirection]++;
+									document.getElementById("affectCount"+this.xAxesNumber+""+this.lifeDirection).innerHTML=this.lifeAffectCount[this.lifeDirection];
+								}
+							}
+							
+							var maxNoise=0;	
 							for (var i=2;i<this.lifePoints.length;i++){
 								var noise1=(Math.abs((this.lifePoints[i].x+this.lifePoints[i-2].x)/2-this.lifePoints[i-1].x)/3)/2*3300;
 								var	noise2=(Math.abs((this.lifePoints[i].y+this.lifePoints[i-2].y)/2-this.lifePoints[i-1].y)/3)/2*3300;
@@ -1437,6 +1530,7 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							document.getElementById("noise"+this.xAxesNumber+""+this.lifeDirection).innerHTML=maxNoise.toFixed(1);
 							this.lifeCycleCount[this.lifeDirection]++;
 							document.getElementById("life"+this.xAxesNumber+""+this.lifeDirection).innerHTML=this.lifeCycleCount[this.lifeDirection];
+
 							if(maxNoise>document.getElementById("lifeNoiseStd").value){
 								this.lifeNoiseCount[this.lifeDirection]++;
 								document.getElementById("noiseCount"+this.xAxesNumber+""+this.lifeDirection).innerHTML=this.lifeNoiseCount[this.lifeDirection];
@@ -1463,10 +1557,19 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 								this.lifeMaxNoise[this.lifeDirection]=maxNoise;
 								document.getElementById("maxNoise"+this.xAxesNumber+""+this.lifeDirection).innerHTML=maxNoise.toFixed(1);
 							}
+							
+							this.saveStats();
+
 							//console.log("最大雜訊："+maxNoise.toFixed(1)+" , 樣本數："+this.lifePoints.length);
 						}
 						this.lifeDirection=0;
 						this.lifePoints=[];
+
+						this.lifeXMax=0;
+						this.lifeYMax=0;
+					}else{
+						if(Math.abs(this.x)>this.lifeXMax)this.lifeXMax=Math.abs(this.x);
+						if(Math.abs(this.y)>this.lifeYMax)this.lifeYMax=Math.abs(this.y);
 					}
 					if(this.lifeDirection>0 || (this.lifeDirection==0 && (Math.abs(this.x)>minBound ||Math.abs(this.y)>minBound ))){
 						this.lifePoints.push({
@@ -1618,6 +1721,27 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							//console.log("xmax="+this.xMax+" , maxoutput="+maxOutput+" , xmin="+this.xMin+" , minoutput="+minOutput);
 						}
 					}
+					if(this.xAxesNumber==0){
+						if(!this.roundnessPass){
+							document.querySelector('[data-key="range"]').style.color = "red";
+						}else{
+							document.querySelector('[data-key="range"]').style.color = "#555";
+					}
+					}
+					if(this.roundnessPass){
+						var rangeDV1 = document.getElementById("rangeDV1").value;
+						var rangeDV2 = document.getElementById("rangeDV2").value;
+						if((this.xMax-this.xMin)/2<(rangeDV1/100) || (this.yMax-this.yMin)/2<(rangeDV1/100) || (this.xMax-this.xMin)/2>(rangeDV2/100) || (this.yMax-this.yMin)/2>(rangeDV2/100)){
+							this.roundnessPass=false;
+						}
+						if(this.xAxesNumber==0){
+							if(!this.roundnessPass){
+								document.querySelector('[data-key="rangeDV"]').style.color = "red";
+							}else{
+								document.querySelector('[data-key="rangeDV"]').style.color = "#555";
+							}
+						} 
+					}
 					ctx.fill();
 					ctx.font = "32px Microsoft YaHei"
 					ctx.fillStyle="orange";
@@ -1736,6 +1860,75 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 			}
 		}
 	}
+	saveStats() {
+		const stats = {
+			lifeCycleCount: this.lifeCycleCount,
+			lifeNoiseCount: this.lifeNoiseCount,
+			lifeMaxNoise: this.lifeMaxNoise,
+			lifeMaxAffect: this.lifeMaxAffect,
+			lifeAffectCount: this.lifeAffectCount,
+			swLife: this.swLife
+		};
+		localStorage.setItem("noiseStats" + this.xAxesNumber, JSON.stringify(stats));
+	}
+	loadStats() {
+		const data = JSON.parse(localStorage.getItem("noiseStats" + this.xAxesNumber) || "null");
+		if (data) {
+			this.lifeCycleCount = data.lifeCycleCount;
+			this.lifeNoiseCount = data.lifeNoiseCount;
+			this.lifeMaxNoise = data.lifeMaxNoise;
+			this.lifeMaxAffect = data.lifeMaxAffect;
+			this.lifeAffectCount = data.lifeAffectCount;
+			this.swLife = data.swLife;
+		}
+		this.renderStats();
+	}
+	renderStats() {
+		const prefix = this.xAxesNumber; // 0 或 2
+
+		// 上 = 1
+		document.getElementById("life" + prefix + "1").innerText = this.lifeCycleCount[1];
+		document.getElementById("maxNoise" + prefix + "1").innerText = this.lifeMaxNoise[1].toFixed(1);
+		document.getElementById("noiseCount" + prefix + "1").innerText = this.lifeNoiseCount[1];
+		document.getElementById("maxAffect" + prefix + "1").innerText = this.lifeMaxAffect[1].toFixed(2);
+		document.getElementById("affectCount" + prefix + "1").innerText = this.lifeAffectCount[1];
+
+		// 下 = 3
+		document.getElementById("life" + prefix + "3").innerText = this.lifeCycleCount[3];
+		document.getElementById("maxNoise" + prefix + "3").innerText = this.lifeMaxNoise[3].toFixed(1);
+		document.getElementById("noiseCount" + prefix + "3").innerText = this.lifeNoiseCount[3];
+		document.getElementById("maxAffect" + prefix + "3").innerText = this.lifeMaxAffect[3].toFixed(2);
+		document.getElementById("affectCount" + prefix + "3").innerText = this.lifeAffectCount[3];
+
+		// 左 = 4
+		document.getElementById("life" + prefix + "4").innerText = this.lifeCycleCount[4];
+		document.getElementById("maxNoise" + prefix + "4").innerText = this.lifeMaxNoise[4].toFixed(1);
+		document.getElementById("noiseCount" + prefix + "4").innerText = this.lifeNoiseCount[4];
+		document.getElementById("maxAffect" + prefix + "4").innerText = this.lifeMaxAffect[4].toFixed(2);
+		document.getElementById("affectCount" + prefix + "4").innerText = this.lifeAffectCount[4];
+
+		// 右 = 2
+		document.getElementById("life" + prefix + "2").innerText = this.lifeCycleCount[2];
+		document.getElementById("maxNoise" + prefix + "2").innerText = this.lifeMaxNoise[2].toFixed(1);
+		document.getElementById("noiseCount" + prefix + "2").innerText = this.lifeNoiseCount[2];
+		document.getElementById("maxAffect" + prefix + "2").innerText = this.lifeMaxAffect[2].toFixed(2);
+		document.getElementById("affectCount" + prefix + "2").innerText = this.lifeAffectCount[2];
+
+		// 開關
+		document.getElementById("lifeSW" + prefix).innerText = this.swLife;
+	}
+	clearStats() {
+		this.lifeCycleCount = [0,0,0,0,0];
+		this.lifeNoiseCount = [0,0,0,0,0];
+		this.lifeMaxNoise = [0,0,0,0,0];
+		this.lifeMaxAffect = [0,0,0,0,0];
+		this.lifeAffectCount = [0,0,0,0,0];
+		this.swLife = 0;
+
+		localStorage.removeItem("noiseStats" + this.xAxesNumber);
+		this.renderStats();
+	}
+
 	addPoint(x, y) {
 		this.points.push({
 			x: x,
@@ -1880,6 +2073,7 @@ for(var i=0;i<=7;i++){
 	testDone("L",i,0);
 	testDone("R",i,0);
 }
+
 function testDone(side, num, result){
 	var resultColor;
 	if(result==0) resultColor="gray";
@@ -1960,20 +2154,21 @@ saveButton.addEventListener('click', function() {
 		setTimeout(() => {
 			toast.classList.remove('show');
 		}, 3000);
-		
-		event.preventDefault();  // 防止滚动页面
+
 		var data1 = (joystick1.x*50+50).toFixed(2);
 		var data2 = (joystick1.xMax*50+50).toFixed(2);
 		var data3 = (joystick1.xMin*50+50).toFixed(2);
 		var data4 = (joystick1.leftx*50+50).toFixed(2);
 		var data5 = (joystick1.rightx*50+50).toFixed(2);
 		var data6 = (Math.abs(joystick1.leftx-joystick1.rightx)*50).toFixed(2);
-		var data7 = (joystick1.y*50+50).toFixed(2);
-		var data8 = (joystick1.yMax*50+50).toFixed(2);
-		var data9 = (joystick1.yMin*50+50).toFixed(2);
-		var data10 = (joystick1.lefty*50+50).toFixed(2);
-		var data11 = (joystick1.righty*50+50).toFixed(2);
-		var data12 = (Math.abs(joystick1.lefty-joystick1.righty)*50).toFixed(2);
+		var data7 = (joystick1.xMaxSlideNoise/2*3300).toFixed(2);
+		var data8 = (joystick1.y*50+50).toFixed(2);
+		var data9 = (joystick1.yMax*50+50).toFixed(2);
+		var data10 = (joystick1.yMin*50+50).toFixed(2);
+		var data11 = (joystick1.lefty*50+50).toFixed(2);
+		var data12 = (joystick1.righty*50+50).toFixed(2);
+		var data13 = (Math.abs(joystick1.lefty-joystick1.righty)*50).toFixed(2);
+		var data14 = (joystick1.yMaxSlideNoise/2*3300).toFixed(2);
 		
 		const testResult = {
 			//左搖桿
@@ -1984,12 +2179,14 @@ saveButton.addEventListener('click', function() {
 			data4,	//左複歸
 			data5,	//右複歸
 			data6,	//左右複歸
-			data7,	//y分壓
-			data8,	//y最大
-			data9,	//y最小
-			data10,	//上複歸
-			data11,	//下複歸
-			data12	//上下複歸
+			data7,	//x滑動雜訊
+			data8,	//y分壓
+			data9,	//y最大
+			data10,	//y最小
+			data11,	//上複歸
+			data12,	//下複歸
+			data13,	//上下複歸
+			data14	//y滑動雜訊
 		};
 		// 從localStorage獲取現有數據或初始化空數組
 		let savedResults = JSON.parse(localStorage.getItem('testResults')) || [];
@@ -2003,12 +2200,14 @@ saveButton.addEventListener('click', function() {
 		data4 = (joystick2.leftx*50+50).toFixed(2);
 		data5 = (joystick2.rightx*50+50).toFixed(2);
 		data6 = (Math.abs(joystick2.leftx-joystick2.rightx)*50).toFixed(2);
-		data7 = (joystick2.y*50+50).toFixed(2);
-		data8 = (joystick2.yMax*50+50).toFixed(2);
-		data9 = (joystick2.yMin*50+50).toFixed(2);
-		data10 = (joystick2.lefty*50+50).toFixed(2);
-		data11 = (joystick2.righty*50+50).toFixed(2);
-		data12 = (Math.abs(joystick2.lefty-joystick2.righty)*50).toFixed(2);
+		data7 = (joystick2.xMaxSlideNoise/2*3300).toFixed(2);
+		data8 = (joystick2.y*50+50).toFixed(2);
+		data9 = (joystick2.yMax*50+50).toFixed(2);
+		data10 = (joystick2.yMin*50+50).toFixed(2);
+		data11 = (joystick2.lefty*50+50).toFixed(2);
+		data12 = (joystick2.righty*50+50).toFixed(2);
+		data13 = (Math.abs(joystick2.lefty-joystick2.righty)*50).toFixed(2);
+		data14 = (joystick2.yMaxSlideNoise/2*3300).toFixed(2);
 		
 		const testResult2 = {
 			//右搖桿
@@ -2019,12 +2218,14 @@ saveButton.addEventListener('click', function() {
 			data4,	//左複歸
 			data5,	//右複歸
 			data6,	//左右複歸
-			data7,	//y分壓
-			data8,	//y最大
-			data9,	//y最小
-			data10,	//上複歸
-			data11,	//下複歸
-			data12	//上下複歸
+			data7,	//x滑動雜訊
+			data8,	//y分壓
+			data9,	//y最大
+			data10,	//y最小
+			data11,	//上複歸
+			data12,	//下複歸
+			data13,	//上下複歸
+			data14	//y滑動雜訊
 		};
 		
 		// 從localStorage獲取現有數據或初始化空數組
@@ -2046,6 +2247,19 @@ const button = document.getElementById('testButton');
 let intervalId;
 // 为按钮添加点击事件
 button.addEventListener('click', function() {
+	
+	document.querySelector('[data-key="tolerance"]').style.color = "#555";
+	document.querySelector('[data-key="staticNoiseMax"]').style.color = "#555";
+	document.querySelector('[data-key="slideNoiseMax"]').style.color = "#555";
+	document.querySelector('[data-key="balanceErr"]').style.color = "#555";
+	document.querySelector('[data-key="onesideDV"]').style.color = "#555";
+	document.querySelector('[data-key="rotateUL"]').style.color = "#555";
+	document.querySelector('[data-key="rangeMax"]').style.color = "#555";	
+	document.querySelector('[data-key="returnErr"]').style.color = "#555";
+	document.querySelector('[data-key="range"]').style.color = "#555";
+	document.querySelector('[data-key="rangeDV"]').style.color = "#555";
+
+
 	if(gamepads[focusGamepad]){
 		clearInterval(intervalId); // 停止定时任务
 		document.getElementById("track0").checked=true;
@@ -2081,9 +2295,11 @@ button.addEventListener('click', function() {
 		returnSTD=parseFloat(document.getElementById("returnStd").value);
 
 		if(Math.abs(x1)>deadzoneSTD ||Math.abs(y1)>deadzoneSTD){	
-			testDone("L",0,2);		
+			testDone("L",0,2);	
+			document.querySelector('[data-key="tolerance"]').style.color = "red";
 		}else{
 			testDone("L",0,1);
+			document.querySelector('[data-key="tolerance"]').style.color = "#555";
 		}
 		var ctx = canvasL[0].getContext("2d");
 		ctx.fillStyle = 'white';
@@ -2119,8 +2335,10 @@ button.addEventListener('click', function() {
 			setTimeout(() => {
 				if(joystick1.xStaticNoiseMax>noiseSTD || joystick1.yStaticNoiseMax>noiseSTD ){
 					testDone("L",1,2);
+					document.querySelector('[data-key="staticNoiseMax"]').style.color = "red";
 				}else{
 					testDone("L",1,1);
+					document.querySelector('[data-key="staticNoiseMax"]').style.color = "#555";
 				}
 				
 				ctx = canvasL[1].getContext("2d");
@@ -2155,9 +2373,17 @@ button.addEventListener('click', function() {
 
 		intervalId = setInterval(() => {
 			if (joystick1.roundnessPass) {
-				testDone("L",2,1);
+				var onesideDV = document.getElementById("onesideDV").value;
+				if(Math.abs(joystick1.xMax-joystick1.rightx)*50<onesideDV || Math.abs(joystick1.xMin-joystick1.leftx)*50<onesideDV || Math.abs(joystick1.yMax-joystick1.righty)*50<onesideDV || Math.abs(joystick1.yMin-joystick1.lefty)*50<onesideDV){
+					testDone("L",2,2);
+					document.querySelector('[data-key="onesideDV"]').style.color = "red";
+				}else{
+					testDone("L",2,1);
+					document.querySelector('[data-key="onesideDV"]').style.color = "#555";
+				}
 			}else{
 				testDone("L",2,2);
+
 			}
 			if (joystick2.roundnessPass) {
 				testDone("R",2,1);
@@ -2166,8 +2392,11 @@ button.addEventListener('click', function() {
 			}
 			if(joystick1.directionPass==1){
 				testDone("L",3,1);
+				document.querySelector('[data-key="rotateUL"]').style.color = "#555";
+
 			}else if(joystick1.directionPass==2){
 				testDone("L",3,2);
+				document.querySelector('[data-key="rotateUL"]').style.color = "red";
 			}
 			if(joystick2.directionPass==1){
 				testDone("R",3,1);
@@ -2179,8 +2408,17 @@ button.addEventListener('click', function() {
 				maxReturn=Math.max(Math.abs((joystick1.leftx-joystick1.rightx)*100/2),Math.abs((joystick1.lefty-joystick1.righty)*100/2));
 				if(maxReturn>returnSTD){
 					testDone("L",4,2);
-				}else{				
-					testDone("L",4,1);
+					document.querySelector('[data-key="rangeMax"]').style.color = "red";
+				}else{
+					document.querySelector('[data-key="rangeMax"]').style.color = "#555";				
+					var returnErr=document.getElementById("returnErr").value;
+					if(Math.abs(joystick1.leftx*50)>returnErr || Math.abs(joystick1.rightx*50)>returnErr || Math.abs(joystick1.lefty*50)>returnErr || Math.abs(joystick1.righty*50)>returnErr){
+						testDone("L",4,2);
+						document.querySelector('[data-key="returnErr"]').style.color = "red";
+					}else{
+						testDone("L",4,1);
+						document.querySelector('[data-key="returnErr"]').style.color = "#555";
+					}
 				}
 				ctx = canvasL[4].getContext("2d");
 				ctx.fillStyle = 'white';
@@ -2193,7 +2431,12 @@ button.addEventListener('click', function() {
 				if(maxReturn>returnSTD){
 					testDone("R",4,2);
 				}else{
-					testDone("R",4,1);
+					var returnErr=document.getElementById("returnErr").value;
+					if(Math.abs(joystick2.leftx*50)>returnErr || Math.abs(joystick2.rightx*50)>returnErr || Math.abs(joystick2.lefty*50)>returnErr || Math.abs(joystick2.righty*50)>returnErr){
+						testDone("R",4,2);
+					}else{
+						testDone("R",4,1);
+					}
 				}
 				ctx = canvasR[4].getContext("2d");
 				ctx.fillStyle = 'white';
@@ -2203,8 +2446,10 @@ button.addEventListener('click', function() {
 			}
 			if(joystick1.xMaxSlideNoise/2*3300>slideNoiseStd || joystick1.yMaxSlideNoise/2*3300>slideNoiseStd){
 				testDone("L",6,2);
+				document.querySelector('[data-key="slideNoiseMax"]').style.color = "red";
 			}else{
 				testDone("L",6,1);
+				document.querySelector('[data-key="slideNoiseMax"]').style.color = "#555";
 			}
 			if(joystick2.xMaxSlideNoise/2*3300>slideNoiseStd || joystick2.yMaxSlideNoise/2*3300>slideNoiseStd){
 				testDone("R",6,2);
@@ -2213,8 +2458,10 @@ button.addEventListener('click', function() {
 			}
 			if(joystick1.balancePass){
 				testDone("L",7,1);
+				document.querySelector('[data-key="balanceErr"]').style.color = "#555";
 			}else{
 				testDone("L",7,2);
+				document.querySelector('[data-key="balanceErr"]').style.color = "red";
 			}
 			if(joystick2.balancePass){
 				testDone("R",7,1);
@@ -2284,7 +2531,7 @@ const modelSelect = document.getElementById('models');
 // 添加預設選項
 const defaultOption = document.createElement('option');
 defaultOption.value = '';
-defaultOption.textContent = '-- 請選擇型號 --';
+defaultOption.textContent = '-- Model --';
 defaultOption.selected = true;
 defaultOption.disabled = true;
 modelSelect.appendChild(defaultOption);

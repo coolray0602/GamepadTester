@@ -24,7 +24,6 @@
 			button { margin-top: 20px; padding: 8px 16px; margin-right: 10px; }
 			.button-group { margin-top: 20px; }
 		</style>
-		<!-- 引入 SheetJS 庫 -->
 		<script src="src/xlsx.full.min.js"></script>
 	</head>
 	<body>
@@ -39,7 +38,6 @@
 		</div>
 		
 		<script>
-			// 顯示數據（添加合併儲存格）
 			function displayResults() {
 				const savedResults = JSON.parse(localStorage.getItem('testResults')) || [];
 				const tableContainer = document.getElementById('resultsTable');
@@ -51,60 +49,52 @@
 				
 				let html = '<table>';
 				
-				// 第一行表頭（合併儲存格）
+				// 第一行表頭
 				html += '<tr>';
 				html += '<th rowspan="2">時間</th>';
-				html += '<th colspan="6" class="header-group">左搖桿X軸</th>';
-				html += '<th colspan="6" class="header-group y-axis-header">左搖桿Y軸</th>';
+				html += '<th colspan="7" class="header-group">左搖桿X軸</th>';
+				html += '<th colspan="7" class="header-group y-axis-header">左搖桿Y軸</th>';
 				html += '</tr>';
 				
-				// 第二行表頭（詳細標題）
+				// 第二行表頭
 				html += '<tr class="sub-header">';
-				html += '<th>中心分壓</th>';
-				html += '<th>最大分壓</th>';
-				html += '<th>最小分壓</th>';
-				html += '<th>左複歸</th>';
-				html += '<th>右複歸</th>';
-				html += '<th>複歸精度</th>';
-				html += '<th>中心分壓</th>';
-				html += '<th>最大分壓</th>';
-				html += '<th>最小分壓</th>';
-				html += '<th>上複歸</th>';
-				html += '<th>下複歸</th>';
-				html += '<th>複歸精度</th>';
+				html += '<th>中心分壓%</th>';
+				html += '<th>最大分壓%</th>';
+				html += '<th>最小分壓%</th>';
+				html += '<th>左複歸%</th>';
+				html += '<th>右複歸%</th>';
+				html += '<th>複歸精度%</th>';
+				html += '<th>滑動雜訊mV</th>';
+				html += '<th>中心分壓%</th>';
+				html += '<th>最大分壓%</th>';
+				html += '<th>最小分壓%</th>';
+				html += '<th>上複歸%</th>';
+				html += '<th>下複歸%</th>';
+				html += '<th>複歸精度%</th>';
+				html += '<th>滑動雜訊mV</th>';
 				html += '</tr>';
 				
-				// 數據行
+				// 數據列
 				savedResults.forEach(result => {
 					html += `<tr><td>${result.timestamp}</td>`;
-					html += `<td>${result.data1}</td>`;
-					html += `<td>${result.data2}</td>`;
-					html += `<td>${result.data3}</td>`;
-					html += `<td>${result.data4}</td>`;
-					html += `<td>${result.data5}</td>`;
-					html += `<td>${result.data6}</td>`;
-					html += `<td>${result.data7}</td>`;
-					html += `<td>${result.data8}</td>`;
-					html += `<td>${result.data9}</td>`;
-					html += `<td>${result.data10}</td>`;
-					html += `<td>${result.data11}</td>`;
-					html += `<td>${result.data12}</td></tr>`;
+					for (let i = 1; i <= 14; i++) {
+						html += `<td>${result[`data${i}`]}</td>`;
+					}
+					html += '</tr>';
 				});
 				
 				html += '</table>';
 				tableContainer.innerHTML = html;
 			}
 			
-			// 清空數據
 			document.getElementById('clearData').addEventListener('click', function() {
 				if (confirm('確定要清空所有數據嗎？此操作無法撤銷。')) {
 					localStorage.removeItem('testResults');
-					displayResults(); // 刷新顯示
+					displayResults();
 					alert('所有數據已清空。');
 				}
 			});
 			
-			// 導出 Excel (添加合併儲存格標題)
 			document.getElementById('exportExcel').addEventListener('click', function() {
 				const savedResults = JSON.parse(localStorage.getItem('testResults')) || [];
 				
@@ -113,16 +103,14 @@
 					return;
 				}
 				
-				// 準備工作表數據
+				// 準備表格資料
 				const wsData = [
-					// 第一行: 合併儲存格標題 (時間列留空)
-					['', '左搖桿X軸', '', '', '', '', '', '左搖桿Y軸', '', '', '', '', ''],
-					// 第二行: 詳細表頭
-					['時間', '中心分壓', '最大分壓', '最小分壓', '左複歸', '右複歸', '複歸精度', 
-					 '中心分壓', '最大分壓', '最小分壓', '左複歸', '右複歸', '複歸精度']
+					['', '左搖桿X軸', '', '', '', '', '', '', '左搖桿Y軸', '', '', '', '', '', ''],
+					['時間', '中心分壓', '最大分壓', '最小分壓', '左複歸', '右複歸', '複歸精度','滑動雜訊', 
+					 '中心分壓', '最大分壓', '最小分壓', '上複歸', '下複歸', '複歸精度','滑動雜訊']
 				];
 				
-				// 添加數據行，確保數值轉換為數字
+				// 填入數據
 				savedResults.forEach(result => {
 					wsData.push([
 						result.timestamp,
@@ -137,112 +125,78 @@
 						Number(result.data9),
 						Number(result.data10),
 						Number(result.data11),
-						Number(result.data12)
+						Number(result.data12),
+						Number(result.data13),
+						Number(result.data14)
 					]);
 				});
 				
-				// 創建工作表
 				const ws = XLSX.utils.aoa_to_sheet(wsData);
 				
-				// 設置合併儲存格
+				// 合併儲存格
 				ws['!merges'] = [
-					// 左搖桿X軸合併儲存格 (B1:G1)
-					{ s: { r: 0, c: 1 }, e: { r: 0, c: 6 } },
-					// 左搖桿Y軸合併儲存格 (H1:M1)
-					{ s: { r: 0, c: 7 }, e: { r: 0, c: 12 } }
+					// B1:H1 (X軸)
+					{ s: { r: 0, c: 1 }, e: { r: 0, c: 7 } },
+					// I1:O1 (Y軸)
+					{ s: { r: 0, c: 8 }, e: { r: 0, c: 14 } }
 				];
 				
-				// 定義樣式
+				// 樣式
+				const borderStyle = {
+					top: { style: 'thin', color: { rgb: "000000" } },
+					bottom: { style: 'thin', color: { rgb: "000000" } },
+					left: { style: 'thin', color: { rgb: "000000" } },
+					right: { style: 'thin', color: { rgb: "000000" } }
+				};
+				
 				const xAxisHeaderStyle = {
 					alignment: { horizontal: 'center', vertical: 'center' },
 					font: { bold: true, sz: 12 },
-					fill: { fgColor: { rgb: "D8E4BC" } }, // 淺綠色
-					border: {
-						top: { style: 'thin', color: { rgb: "000000" } },
-						bottom: { style: 'thin', color: { rgb: "000000" } },
-						left: { style: 'thin', color: { rgb: "000000" } },
-						right: { style: 'thin', color: { rgb: "000000" } }
-					}
+					fill: { fgColor: { rgb: "D8E4BC" } },
+					border: borderStyle
 				};
 				
 				const yAxisHeaderStyle = {
 					...xAxisHeaderStyle,
-					fill: { fgColor: { rgb: "FFF2CC" } } // 淺黃色
+					fill: { fgColor: { rgb: "FFF2CC" } }
 				};
 				
 				const subHeaderStyle = {
 					font: { bold: true },
-					fill: { fgColor: { rgb: "F2F2F2" } }, // 淺灰色
-					border: {
-						top: { style: 'thin', color: { rgb: "000000" } },
-						bottom: { style: 'thin', color: { rgb: "000000" } },
-						left: { style: 'thin', color: { rgb: "000000" } },
-						right: { style: 'thin', color: { rgb: "000000" } }
-					}
+					fill: { fgColor: { rgb: "F2F2F2" } },
+					border: borderStyle
 				};
 				
-				// 應用樣式到合併儲存格
-				ws['B1'] = {
-					v: '左搖桿X軸',
-					t: 's',
-					s: xAxisHeaderStyle
-				};
+				ws['B1'] = { v: '左搖桿X軸', t: 's', s: xAxisHeaderStyle };
+				ws['I1'] = { v: '左搖桿Y軸', t: 's', s: yAxisHeaderStyle };
 				
-				ws['H1'] = {
-					v: '左搖桿Y軸',
-					t: 's',
-					s: yAxisHeaderStyle
-				};
-				
-				// 應用樣式到詳細表頭 (第二行)
-				for (let col = 0; col < 13; col++) {
-					const cellAddress = XLSX.utils.encode_cell({ r: 1, c: col });
-					if (ws[cellAddress]) {
-						ws[cellAddress].s = {
-							...(ws[cellAddress].s || {}),
-							...subHeaderStyle
-						};
-					}
+				for (let col = 0; col <= 14; col++) {
+					const addr = XLSX.utils.encode_cell({ r: 1, c: col });
+					if (ws[addr]) ws[addr].s = subHeaderStyle;
 				}
 				
-				// 設置數值列的單元格格式為數字
+				// 數據樣式
 				const range = XLSX.utils.decode_range(ws['!ref']);
-				for (let row = 2; row <= range.e.r; row++) { // 從第3行開始是數據
-					for (let col = 1; col <= 12; col++) { // 從第2列到第13列是數值列
-						const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
-						if (ws[cellAddress]) {
-							ws[cellAddress].t = 'n'; // 設置單元格類型為數字
-							ws[cellAddress].z = '0.00'; // 設置數字格式為兩位小數
-							ws[cellAddress].s = {
-								...(ws[cellAddress].s || {}),
-								border: {
-									top: { style: 'thin', color: { rgb: "000000" } },
-									bottom: { style: 'thin', color: { rgb: "000000" } },
-									left: { style: 'thin', color: { rgb: "000000" } },
-									right: { style: 'thin', color: { rgb: "000000" } }
-								}
-							};
+				for (let r = 2; r <= range.e.r; r++) {
+					for (let c = 1; c <= 14; c++) {
+						const addr = XLSX.utils.encode_cell({ r, c });
+						if (ws[addr]) {
+							ws[addr].t = 'n';
+							ws[addr].z = '0.00';
+							ws[addr].s = { border: borderStyle };
 						}
 					}
 				}
 				
-				// 設置列寬
-				ws['!cols'] = [
-					{ wch: 20 }, // 時間列寬
-					{ wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 },
-					{ wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }
-				];
+				ws['!cols'] = [{ wch: 20 }, ...Array(14).fill({ wch: 12 })];
 				
-				// 創建工作簿
 				const wb = XLSX.utils.book_new();
-				XLSX.utils.book_append_sheet(wb, ws, "測試結果");
+				XLSX.utils.book_append_sheet(wb, ws, '測試結果');
 				
-				// 導出文件
 				const fileName = `測試結果_${new Date().toISOString().slice(0, 10)}.xlsx`;
 				XLSX.writeFile(wb, fileName);
 			});
 			
-			// 初始顯示
 			displayResults();
 		</script>
 	</body>

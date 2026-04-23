@@ -1272,35 +1272,57 @@ strong {
   background: #f0f0f0;
   border: 1px solid #ccc;
 }
-        .tableContainer {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 550px;
-        }
-        table {
-            width: 500px;
-            border-collapse: collapse;
-            margin: 0 auto;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: center;
-        }
-        th {
-            background-color: #3D405B;
-            color: white;
-            font-weight: 600;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #e9f7fe;
-        }
-        .direction {
-            font-weight: 600;
-            background-color: #ecf0f1;
-        }
+.tableContainer {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 550px;
+}
+table {
+    width: 500px;
+    border-collapse: collapse;
+    margin: 0 auto;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 5px;
+    text-align: center;
+}
+th.typeA {
+    background-color: #3D405B;
+    color: white;
+    font-weight: 300;
+}
+th.typeB {
+    background-color: #2d3f2e;
+    color: white;
+    font-weight: 300;
+}
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+tr:hover {
+    background-color: #e9f7fe;
+}
+table, th, td {
+  font-size: 14px;   /* ← 你想要的字體大小 */
+}
+.direction {
+    font-weight: 600;
+    background-color: #ecf0f1;
+}
+.row-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+.row-line span {
+  min-width: 100px; /* 控制標題寬度，可依需要微調 */
+}
+.row-line label {
+  text-align: right;
+  width: 60px; /* 統一寬度可讓右側對齊 */
+  display: inline-block;
+}
