@@ -1056,6 +1056,7 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							setTimeout(() => {
 								toast.classList.remove('show');
 							}, 3000);
+							unsavedTest = false;	//開關測試已自動保存，解除「必須保存才能重測」限制
 						}
 						testDone("L",5,1);
 					}else{
@@ -1119,6 +1120,7 @@ class myJoystick{	//左搖桿控制五支手柄的左搖桿，右搖桿亦然
 							setTimeout(() => {
 								toast.classList.remove('show');
 							}, 3000);
+							unsavedTest = false;	//開關測試已自動保存，解除「必須保存才能重測」限制
 						}
 						testDone("R",5,1);
 					}else{
@@ -2145,6 +2147,42 @@ resetBtn.addEventListener('click', function(){
 	}
 });
 const saveButton = document.getElementById('saveButton');
+var unsavedTest = false;	//本筆測試是否尚未保存(用於「必須保存才能重測」檢查)
+
+//播放警告音(Web Audio API，不需要音檔)
+function playWarnSound(){
+	try{
+		var ctx = new (window.AudioContext || window.webkitAudioContext)();
+		var osc = ctx.createOscillator();
+		var gain = ctx.createGain();
+		osc.type = 'square';
+		osc.frequency.setValueAtTime(880, ctx.currentTime);
+		osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+		gain.gain.setValueAtTime(0.25, ctx.currentTime);
+		gain.gain.setValueAtTime(0, ctx.currentTime + 0.3);
+		osc.connect(gain);
+		gain.connect(ctx.destination);
+		osc.start();
+		osc.stop(ctx.currentTime + 0.3);
+		osc.onended = function(){ ctx.close(); };
+	}catch(e){
+		//忽略音效播放失敗
+	}
+}
+
+//顯示「必須保存才能重測」警告：置中、有警示音、需點擊(或按鈕/空白鍵)才消失
+function showSaveWarning(){
+	var warnToast = document.getElementById('warnToast');
+	if(warnToast.classList.contains('show')){
+		return;	//已在顯示中，不重複跳出
+	}
+	warnToast.classList.add('show');
+	playWarnSound();
+}
+//點擊警告框或「確定」按鈕關閉
+document.getElementById('warnToast').addEventListener('click', function(){
+	this.classList.remove('show');
+});
 saveButton.addEventListener('click', function() {
 	if(checkGamepadsConnected()){
 		const toast = document.getElementById('toast');
@@ -2236,6 +2274,7 @@ saveButton.addEventListener('click', function() {
 		
 		// 保存回localStorage
 		localStorage.setItem('testResults2', JSON.stringify(savedResults2));
+		unsavedTest = false;	//已保存，解除「必須保存才能重測」限制
 	}else{
 		alert("請先連接上手柄再作保存！");
 	}
@@ -2247,7 +2286,13 @@ const button = document.getElementById('testButton');
 let intervalId;
 // 为按钮添加点击事件
 button.addEventListener('click', function() {
-	
+
+	//「必須保存才能重測」：上一筆測試尚未保存時，阻止開始新測試
+	if(document.getElementById("mustSaveCB").checked && unsavedTest){
+		showSaveWarning();
+		return;
+	}
+
 	document.querySelector('[data-key="tolerance"]').style.color = "#555";
 	document.querySelector('[data-key="staticNoiseMax"]').style.color = "#555";
 	document.querySelector('[data-key="slideNoiseMax"]').style.color = "#555";
@@ -2262,6 +2307,7 @@ button.addEventListener('click', function() {
 
 	if(gamepads[focusGamepad]){
 		clearInterval(intervalId); // 停止定时任务
+		unsavedTest = true;	//本筆測試開始，標記為未保存
 		document.getElementById("track0").checked=true;
 		document.getElementById("left-joystick-track").getContext("2d").clearRect(0,0,ctxWidth,ctxWidth);
 		document.getElementById("track2").checked=true;

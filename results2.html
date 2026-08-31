@@ -51,6 +51,7 @@
 				
 				// 第一行表頭
 				html += '<tr>';
+				html += '<th rowspan="2">No.</th>';
 				html += '<th rowspan="2">時間</th>';
 				html += '<th colspan="7" class="header-group">右搖桿X軸</th>';
 				html += '<th colspan="7" class="header-group y-axis-header">右搖桿Y軸</th>';
@@ -75,8 +76,8 @@
 				html += '</tr>';
 				
 				// 數據列
-				savedResults.forEach(result => {
-					html += `<tr><td>${result.timestamp}</td>`;
+				savedResults.forEach((result, index) => {
+					html += `<tr><td>${index + 1}</td><td>${result.timestamp}</td>`;
 					for (let i = 1; i <= 14; i++) {
 						html += `<td>${result[`data${i}`]}</td>`;
 					}
@@ -105,14 +106,15 @@
 				
 				// 準備表格資料
 				const wsData = [
-					['', '右搖桿X軸', '', '', '', '', '', '', '右搖桿Y軸', '', '', '', '', '', ''],
-					['時間', '中心分壓', '最大分壓', '最小分壓', '左複歸', '右複歸', '複歸精度','滑動雜訊', 
+					['序號', '', '右搖桿X軸', '', '', '', '', '', '', '右搖桿Y軸', '', '', '', '', '', ''],
+					['', '時間', '中心分壓', '最大分壓', '最小分壓', '左複歸', '右複歸', '複歸精度','滑動雜訊', 
 					 '中心分壓', '最大分壓', '最小分壓', '上複歸', '下複歸', '複歸精度','滑動雜訊']
 				];
 				
 				// 填入數據
-				savedResults.forEach(result => {
+				savedResults.forEach((result, index) => {
 					wsData.push([
+						index + 1,
 						result.timestamp,
 						Number(result.data1),
 						Number(result.data2),
@@ -135,10 +137,12 @@
 				
 				// 合併儲存格
 				ws['!merges'] = [
-					// B1:H1 (X軸)
-					{ s: { r: 0, c: 1 }, e: { r: 0, c: 7 } },
-					// I1:O1 (Y軸)
-					{ s: { r: 0, c: 8 }, e: { r: 0, c: 14 } }
+					// A1:A2 (序號)
+					{ s: { r: 0, c: 0 }, e: { r: 1, c: 0 } },
+					// C1:I1 (X軸)
+					{ s: { r: 0, c: 2 }, e: { r: 0, c: 8 } },
+					// J1:P1 (Y軸)
+					{ s: { r: 0, c: 9 }, e: { r: 0, c: 15 } }
 				];
 				
 				// 樣式
@@ -167,10 +171,11 @@
 					border: borderStyle
 				};
 				
-				ws['B1'] = { v: '右搖桿X軸', t: 's', s: xAxisHeaderStyle };
-				ws['I1'] = { v: '右搖桿Y軸', t: 's', s: yAxisHeaderStyle };
+				ws['A1'] = { v: '序號', t: 's', s: subHeaderStyle };
+				ws['C1'] = { v: '右搖桿X軸', t: 's', s: xAxisHeaderStyle };
+				ws['J1'] = { v: '右搖桿Y軸', t: 's', s: yAxisHeaderStyle };
 				
-				for (let col = 0; col <= 14; col++) {
+				for (let col = 0; col <= 15; col++) {
 					const addr = XLSX.utils.encode_cell({ r: 1, c: col });
 					if (ws[addr]) ws[addr].s = subHeaderStyle;
 				}
@@ -178,7 +183,7 @@
 				// 數據樣式
 				const range = XLSX.utils.decode_range(ws['!ref']);
 				for (let r = 2; r <= range.e.r; r++) {
-					for (let c = 1; c <= 14; c++) {
+					for (let c = 2; c <= 15; c++) {
 						const addr = XLSX.utils.encode_cell({ r, c });
 						if (ws[addr]) {
 							ws[addr].t = 'n';
@@ -188,7 +193,7 @@
 					}
 				}
 				
-				ws['!cols'] = [{ wch: 20 }, ...Array(14).fill({ wch: 12 })];
+				ws['!cols'] = [{ wch: 6 }, { wch: 20 }, ...Array(14).fill({ wch: 12 })];
 				
 				const wb = XLSX.utils.book_new();
 				XLSX.utils.book_append_sheet(wb, ws, '測試結果');

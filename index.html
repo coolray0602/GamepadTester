@@ -631,10 +631,11 @@
 						<center><a href="results2.html" target="_blank" id="viewResults"><span data-key="checkSaved">查看結果</span></a></center>
 						</div>
 					</div>
-					<center><button id="resetButton">Reset</button> &nbsp;&nbsp;<button id="saveButton"><span data-key="saveData">保存數據(Enter鍵)</span></button> <span data-key="saveOnSwitch">測試開關功能時保存</span><input type="checkbox" id="swSave"></center>
+					<center><button id="resetButton">Reset</button> &nbsp;&nbsp;<button id="saveButton"><span data-key="saveData">保存數據(Enter鍵)</span></button> <span data-key="saveOnSwitch">測試開關功能時保存</span><input type="checkbox" id="swSave"> &nbsp;&nbsp; <span data-key="mustSave">必須保存才能重測</span><input type="checkbox" id="mustSaveCB"></center>
 				</div>
 			</section>
 			<div id="toast" class="toast" data-key="saved">數據已保存</div>
+		<div id="warnToast" class="toast-warn"><span data-key="mustSaveWarn">本筆測試數據尚未保存，請先按「保存數據」鍵(Enter)保存後再進行下一筆測試</span><br><button id="warnToastBtn" data-key="okBtn">確定</button></div>
 		</main>
 		<footer class="text-center mt-5 py-3">
 				<span data-key="copyright">© 2024 Ray Liu. All rights reserved.</span>
